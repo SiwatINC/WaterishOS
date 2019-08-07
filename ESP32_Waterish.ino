@@ -81,12 +81,17 @@ void fakeInterupt(void *pvParameters) {
     }
   }
 }
+void sendstatemqtt(){
+    for(int counter;counter<=6;counter++)mqtt.publish("/waterishos/node"+nodename+"/flowrate/"+counter,String(sensor[counter].getCurrentFlowrate()));
+    for(int counter;counter<=6;counter++)mqtt.publish("/waterishos/node"+nodename+"/volume/"+counter,String(sensor[counter].getTotalVolume()));
+}
 void reportSensorState(void *pvParameters) {
   while (1) {
     delay(period);
     int flowrate[6];
     for (int counter = 0; counter <= 6; counter++)sensor[counter].tick(period);
     for (int counter = 0; counter <= 6; counter++)flowrate[counter] = sensor[counter].getCurrentFlowrate();
+    if(online&&telemetryconnected)sendstatemqtt();
     updateLCD("Waterish Core", flowrate);
   }
 }
